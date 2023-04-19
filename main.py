@@ -7,22 +7,21 @@ from queue import PriorityQueue
 class Color(Enum):
     DEFAULT = (255, 255, 255)
     GRID_LINE = (128, 128, 128)
-    START_NODE = (0, 0, 255)
-    END_NODE = (255, 0, 0)
+    START_NODE = (255, 32, 32)
+    END_NODE = (32, 32, 255)
     BARRIER = (0, 0, 0)
     OPEN = (0, 255, 0)
     VISITED = (255, 255, 0)
-    PATH = (128, 0, 128)
+    PATH = (255, 192, 255)
 
 
 class Cell:
-
     def __init__(self, row, col, width):
         self.row = row
         self.col = col
         self.x = row * width
         self.y = col * width
-        self.color = Color.DEFAULT.value
+        self.color = Color.DEFAULT
         self.neighbors = []
         self.width = width
 
@@ -30,44 +29,43 @@ class Cell:
         return self.row, self.col
 
     def is_closed(self):
-        return self.color == Color.VISITED.value
+        return self.color == Color.VISITED
 
     def is_open(self):
-        return self.color == Color.OPEN.value
+        return self.color == Color.OPEN
 
     def is_barrier(self):
-        return self.color == Color.BARRIER.value
+        return self.color == Color.BARRIER
 
     def is_start(self):
-        return self.color == Color.START_NODE.value
+        return self.color == Color.START_NODE
 
     def is_end(self):
-        return self.color == Color.END_NODE.value
+        return self.color == Color.END_NODE
 
     def reset(self):
-        self.color = Color.DEFAULT.value
+        self.color = Color.DEFAULT
 
     def make_start(self):
-        self.color = Color.START_NODE.value
+        self.color = Color.START_NODE
 
     def make_closed(self):
-        self.color = Color.VISITED.value
+        self.color = Color.VISITED
 
     def make_open(self):
-        self.color = Color.OPEN.value
+        self.color = Color.OPEN
 
     def make_barrier(self):
-        self.color = Color.BARRIER.value
+        self.color = Color.BARRIER
 
     def make_end(self):
-        self.color = Color.END_NODE.value
+        self.color = Color.END_NODE
 
     def make_path(self):
-        self.color = Color.PATH.value
+        self.color = Color.PATH
 
     def draw(self, win):
-        pygame.draw.rect(win, self.color,
-                         (self.x, self.y, self.width, self.width))
+        pygame.draw.rect(win, self.color.value, (self.x, self.y, self.width, self.width))
 
     def __lt__(self, other):
         return False
@@ -99,13 +97,19 @@ class Grid:
 
     def __draw_grid_lines(self):
         for i in range(self.rows):
-            pygame.draw.line(self.window, Color.GRID_LINE.value,
-                             (0, i * self.spacing),
-                             (self.length, i * self.spacing))
+            pygame.draw.line(
+                self.window,
+                Color.GRID_LINE.value,
+                (0, i * self.spacing),
+                (self.length, i * self.spacing)
+            )
             for j in range(self.rows):
-                pygame.draw.line(self.window, Color.GRID_LINE.value,
-                                 (j * self.spacing, 0),
-                                 (j * self.spacing, self.length))
+                pygame.draw.line(
+                    self.window,
+                    Color.GRID_LINE.value,
+                    (j * self.spacing, 0),
+                    (j * self.spacing, self.length)
+                )
 
     def draw(self):
         self.window.fill(Color.DEFAULT.value)
@@ -121,20 +125,16 @@ class Grid:
         for i in range(self.rows):
             for j in range(self.rows):
                 self.get(i, j).neighbors = []
-                if self.get(i, j).row < self.rows - 1 and not self.get(
-                        i + 1, j).is_barrier():  # DOWN
+                if self.get(i, j).row < self.rows - 1 and not self.get(i + 1, j).is_barrier():  # DOWN
                     self.get(i, j).neighbors.append(self.get(i + 1, j))
 
-                if self.get(i, j).row > 0 and not self.get(
-                        i - 1, j).is_barrier():  # UP
+                if self.get(i, j).row > 0 and not self.get(i - 1, j).is_barrier():  # UP
                     self.get(i, j).neighbors.append(self.get(i - 1, j))
 
-                if self.get(i, j).col < self.rows - 1 and not self.get(
-                        i, j + 1).is_barrier():  # RIGHT
+                if self.get(i, j).col < self.rows - 1 and not self.get(i, j + 1).is_barrier():  # RIGHT
                     self.get(i, j).neighbors.append(self.get(i, j + 1))
 
-                if self.get(i, j).col > 0 and not self.get(
-                        i, j - 1).is_barrier():  # LEFT
+                if self.get(i, j).col > 0 and not self.get(i, j - 1).is_barrier():  # LEFT
                     self.get(i, j).neighbors.append(self.get(i, j - 1))
 
 
@@ -164,15 +164,9 @@ def a_star(visualizer):
     open_set = PriorityQueue()
     open_set.put((0, count, start))
     came_from = {}
-    g_score = {
-        grid.get(i, j): math.inf
-        for i in range(size) for j in range(size)
-    }
+    g_score = {grid.get(i, j): math.inf for i in range(size) for j in range(size)}
     g_score[start] = 0
-    f_score = {
-        grid.get(i, j): math.inf
-        for i in range(size) for j in range(size)
-    }
+    f_score = {grid.get(i, j): math.inf for i in range(size) for j in range(size)}
     f_score[start] = heuristic(start.get_pos(), end.get_pos())
 
     open_set_hash = {start}
@@ -196,8 +190,7 @@ def a_star(visualizer):
             if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
                 g_score[neighbor] = temp_g_score
-                f_score[neighbor] = temp_g_score + heuristic(
-                    neighbor.get_pos(), end.get_pos())
+                f_score[neighbor] = temp_g_score + heuristic(neighbor.get_pos(), end.get_pos())
                 if neighbor not in open_set_hash:
                     count += 1
                     open_set.put((f_score[neighbor], count, neighbor))
@@ -257,7 +250,7 @@ class Visualizer:
         elif current_cell == self.end:
             self.end = None
 
-    def execute(self):
+    def execute(self, func):
         self.executed = True
         while self.executed:
             self.grid.draw()
@@ -274,9 +267,7 @@ class Visualizer:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE and self.start and self.end:
                         self.grid.update_neighbors()
-                        result = a_star(self)
-                        if not result:
-                            print("Unreachable!!!")
+                        func(self)
 
                     if event.key == pygame.K_c:
                         self.start = None
@@ -286,9 +277,11 @@ class Visualizer:
 
 
 def main():
-    Visualizer(rows=20,
-               size_in_pixels=300,
-               caption="A* Path Finding Algorithm").execute()
+    Visualizer(
+        rows=20,
+        size_in_pixels=300,
+        caption="A* Path Finding Algorithm"
+    ).execute(a_star)
 
 
 if __name__ == '__main__':
