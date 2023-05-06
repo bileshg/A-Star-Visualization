@@ -16,6 +16,7 @@ class Color(Enum):
 
 
 class Cell:
+
     def __init__(self, row, col, width):
         self.row = row
         self.col = col
@@ -65,7 +66,8 @@ class Cell:
         self.color = Color.PATH
 
     def draw(self, win):
-        pygame.draw.rect(win, self.color.value, (self.x, self.y, self.width, self.width))
+        pygame.draw.rect(win, self.color.value,
+                         (self.x, self.y, self.width, self.width))
 
     def __lt__(self, other):
         return False
@@ -97,19 +99,13 @@ class Grid:
 
     def __draw_grid_lines(self):
         for i in range(self.rows):
-            pygame.draw.line(
-                self.window,
-                Color.GRID_LINE.value,
-                (0, i * self.spacing),
-                (self.length, i * self.spacing)
-            )
+            pygame.draw.line(self.window, Color.GRID_LINE.value,
+                             (0, i * self.spacing),
+                             (self.length, i * self.spacing))
             for j in range(self.rows):
-                pygame.draw.line(
-                    self.window,
-                    Color.GRID_LINE.value,
-                    (j * self.spacing, 0),
-                    (j * self.spacing, self.length)
-                )
+                pygame.draw.line(self.window, Color.GRID_LINE.value,
+                                 (j * self.spacing, 0),
+                                 (j * self.spacing, self.length))
 
     def draw(self):
         self.window.fill(Color.DEFAULT.value)
@@ -125,16 +121,20 @@ class Grid:
         for i in range(self.rows):
             for j in range(self.rows):
                 self.get(i, j).neighbors = []
-                if self.get(i, j).row < self.rows - 1 and not self.get(i + 1, j).is_barrier():  # DOWN
+                if self.get(i, j).row < self.rows - 1 and not self.get(
+                        i + 1, j).is_barrier():  # DOWN
                     self.get(i, j).neighbors.append(self.get(i + 1, j))
 
-                if self.get(i, j).row > 0 and not self.get(i - 1, j).is_barrier():  # UP
+                if self.get(i, j).row > 0 and not self.get(
+                        i - 1, j).is_barrier():  # UP
                     self.get(i, j).neighbors.append(self.get(i - 1, j))
 
-                if self.get(i, j).col < self.rows - 1 and not self.get(i, j + 1).is_barrier():  # RIGHT
+                if self.get(i, j).col < self.rows - 1 and not self.get(
+                        i, j + 1).is_barrier():  # RIGHT
                     self.get(i, j).neighbors.append(self.get(i, j + 1))
 
-                if self.get(i, j).col > 0 and not self.get(i, j - 1).is_barrier():  # LEFT
+                if self.get(i, j).col > 0 and not self.get(
+                        i, j - 1).is_barrier():  # LEFT
                     self.get(i, j).neighbors.append(self.get(i, j - 1))
 
 
@@ -164,9 +164,15 @@ def a_star(visualizer):
     open_set = PriorityQueue()
     open_set.put((0, count, start))
     came_from = {}
-    g_score = {grid.get(i, j): math.inf for i in range(size) for j in range(size)}
+    g_score = {
+        grid.get(i, j): math.inf
+        for i in range(size) for j in range(size)
+    }
     g_score[start] = 0
-    f_score = {grid.get(i, j): math.inf for i in range(size) for j in range(size)}
+    f_score = {
+        grid.get(i, j): math.inf
+        for i in range(size) for j in range(size)
+    }
     f_score[start] = heuristic(start.get_pos(), end.get_pos())
 
     open_set_hash = {start}
@@ -190,7 +196,8 @@ def a_star(visualizer):
             if temp_g_score < g_score[neighbor]:
                 came_from[neighbor] = current
                 g_score[neighbor] = temp_g_score
-                f_score[neighbor] = temp_g_score + heuristic(neighbor.get_pos(), end.get_pos())
+                f_score[neighbor] = temp_g_score + heuristic(
+                    neighbor.get_pos(), end.get_pos())
                 if neighbor not in open_set_hash:
                     count += 1
                     open_set.put((f_score[neighbor], count, neighbor))
@@ -277,11 +284,9 @@ class Visualizer:
 
 
 def main():
-    Visualizer(
-        rows=20,
-        size_in_pixels=300,
-        caption="A* Path Finding Algorithm"
-    ).execute(a_star)
+    Visualizer(rows=30,
+               size_in_pixels=450,
+               caption="A* Path Finding Algorithm").execute(a_star)
 
 
 if __name__ == '__main__':
