@@ -5,7 +5,7 @@ description = ""
 authors = ["Bilesh Ganguly"]
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<3.9"
+python = ">=3.9.0"
 pygame = "^2.1.2"
 dearpygui = "^1.6.2"
 
