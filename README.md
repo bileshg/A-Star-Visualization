@@ -50,3 +50,7 @@ This project requires the following dependencies:
    - Right-click on any node to reset it to the default state.
    - Press the spacebar to begin the A* pathfinding algorithm visualization.
    - Press 'C' to clear the grid and start over.
+
+## Acknowledgments
+
+Thanks to [TechWithTim](https://www.youtube.com/@TechWithTim) for the inspiration and the tutorial on which this project is based.
